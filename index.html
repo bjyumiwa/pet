@@ -1,0 +1,464 @@
+<html><head><base href="https://websim.io/pet-sake-social/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ペット酒創 🐾🍶</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=M+PLUS+Rounded+1c:wght@300;500&display=swap');
+
+  body {
+    font-family: 'M PLUS Rounded 1c', 'Kosugi Maru', sans-serif;
+    background-color: #F0F8FF;
+    color: #5D4037;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #FFF;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+  h1, h2 {
+    text-align: center;
+    color: #4169E1;
+  }
+  h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+  }
+  .description {
+    text-align: center;
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    color: #6A5ACD;
+  }
+  .section {
+    margin-top: 30px;
+    background-color: #E6F2FF;
+    border-radius: 15px;
+    padding: 20px;
+  }
+  .ingredient, .snack {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  select, input[type="number"], input[type="text"], input[type="date"] {
+    margin-right: 10px;
+    padding: 8px;
+    border: 2px solid #87CEFA;
+    border-radius: 10px;
+    font-size: 1em;
+  }
+  button {
+    background-color: #4169E1;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    font-size: 1em;
+  }
+  button:hover {
+    background-color: #1E90FF;
+    transform: scale(1.05);
+  }
+  #cocktailContainer {
+    width: 200px;
+    height: 250px;
+    margin: 30px auto;
+    position: relative;
+  }
+  #cocktailGlass {
+    width: 100%;
+    height: 100%;
+  }
+  #cocktailLiquid {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    right: 40px;
+    height: 0;
+    transition: height 0.5s, background-color 0.5s;
+    border-radius: 0 0 100px 100px;
+  }
+  .result p {
+    text-align: center;
+    font-size: 1.2em;
+  }
+  #socialFeed {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #87CEFA;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 20px;
+  }
+  .post {
+    background-color: #F0F8FF;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .friend-request {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #E6F2FF;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  #animalSilhouette {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    opacity: 0.2;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🐾 ペット酒創 🍶</h1>
+  
+  <p class="description">あなた好みのお酒を造って、友達とシェアしよう！<br>
+  ペットの個性を反映したユニークな味わいで、新しい出会いが待っているかも？</p>
+  
+  <div class="section">
+    <h2>🌸 材料を選択 🍃</h2>
+    <div id="ingredientList"></div>
+    <button onclick="addIngredient()">🎋 材料を追加 🎋</button>
+  </div>
+  
+  <div class="section">
+    <h2>🍢 おつまみを選択 🍢</h2>
+    <div id="snackList"></div>
+    <button onclick="addSnack()">🍡 おつまみを追加 🍡</button>
+  </div>
+  
+  <div class="section result">
+    <h2>🎉 できあがり 🎉</h2>
+    <div id="cocktailContainer">
+      <svg id="cocktailGlass" viewBox="0 0 200 250" width="200" height="250">
+        <path d="M40 250 L60 50 Q100 30 140 50 L160 250 Z" fill="none" stroke="#4169E1" stroke-width="4"/>
+        <circle cx="100" cy="30" r="15" fill="#4169E1"/>
+        <rect x="95" y="230" width="10" height="20" fill="#4169E1"/>
+      </svg>
+      <div id="cocktailLiquid"></div>
+      <svg id="animalSilhouette" viewBox="0 0 100 100"></svg>
+    </div>
+    <p>名前: <span id="cocktailName"></span></p>
+    <p>アルコール度数: <span id="alcoholContent"></span>%</p>
+    <p>味: <span id="taste"></span></p>
+    <p>熟成期間: <input type="number" id="agingPeriod" min="0" max="365" value="0"> 日</p>
+    <p>予想の味: <span id="predictedTaste"></span></p>
+    <p>おすすめおつまみ: <span id="recommendedSnacks"></span></p>
+    <p>記録日: <input type="date" id="recordDate"></p>
+    <button onclick="shareCocktail()">🎭 シェアする 🎭</button>
+  </div>
+
+  <div class="section">
+    <h2>👥 フレンド 👥</h2>
+    <input type="text" id="friendName" placeholder="フレンド名">
+    <button onclick="sendFriendRequest()">🤝 フレンド申請 🤝</button>
+    <div id="friendRequests"></div>
+  </div>
+
+  <div class="section">
+    <h2>📱 ソーシャルフィード 📱</h2>
+    <div id="socialFeed"></div>
+  </div>
+</div>
+
+<script>
+const ingredients = [
+  { name: '梅酒', alcohol: 12, taste: '甘酸っぱい', category: '日本のお酒' },
+  { name: '芋焼酎', alcohol: 25, taste: 'まろやか', category: '日本のお酒' },
+  { name: '麦焼酎', alcohol: 25, taste: 'すっきり', category: '日本のお酒' },
+  { name: '日本酒', alcohol: 15, taste: '繊細', category: '日本のお酒' },
+  { name: '柚子酒', alcohol: 8, taste: '柑橘系', category: '日本のお酒' },
+  { name: 'ウォッカ', alcohol: 40, taste: '強烈', category: '洋酒' },
+  { name: 'ジン', alcohol: 40, taste: 'ハーバル', category: '洋酒' },
+  { name: 'ラム', alcohol: 40, taste: '甘い', category: '洋酒' },
+  { name: 'テキーラ', alcohol: 40, taste: '強烈', category: '洋酒' },
+  { name: 'ウイスキー', alcohol: 40, taste: 'スモーキー', category: '洋酒' },
+  { name: '緑茶', alcohol: 0, taste: '渋い', category: 'ソフトドリンク' },
+  { name: 'ほうじ茶', alcohol: 0, taste: '香ばしい', category: 'ソフトドリンク' },
+  { name: 'トニックウォーター', alcohol: 0, taste: '苦い', category: 'ソフトドリンク' },
+  { name: 'ソーダ', alcohol: 0, taste: '爽やか', category: 'ソフトドリンク' },
+  { name: 'オレンジジュース', alcohol: 0, taste: '甘酸っぱい', category: 'ソフトドリンク' },
+  { name: 'クランベリージュース', alcohol: 0, taste: '酸っぱい', category: 'ソフトドリンク' },
+  { name: 'ライムジュース', alcohol: 0, taste: '酸っぱい', category: 'ソフトドリンク' },
+  { name: 'コーラ', alcohol: 0, taste: '甘い', category: 'ソフトドリンク' },
+  { name: 'レモネード', alcohol: 0, taste: '甘酸っぱい', category: 'ソフトドリンク' },
+  { name: 'ジンジャーエール', alcohol: 0, taste: 'スパイシー', category: 'ソフトドリンク' },
+];
+
+const snacks = [
+  '枝豆', 'チーズ', '焼き鳥', 'おつまみ昆布', 'ミックスナッツ', 'オリーブ',
+  'たこわさ', 'カニカマ', 'えだまめンタル', 'ポテトチップス', 'クラッカー',
+  '冷奴', '漬物盛り合わせ', 'ビーフジャーキー', 'スモークサーモン', 'プロシュート',
+  '塩辛', 'いぶりがっこ', 'カマンベールチーズフライ', 'ピクルス'
+];
+
+const animalSilhouettes = [
+  `<path d="M50,20 C30,20 20,40 20,50 C20,60 30,80 50,80 C70,80 80,60 80,50 C80,40 70,20 50,20 Z M35,40 Q25,40 25,50 Q25,60 35,60 Q45,60 45,50 Q45,40 35,40 Z M65,40 Q75,40 75,50 Q75,60 65,60 Q55,60 55,50 Q55,40 65,40 Z M50,65 Q40,65 40,70 Q50,75 60,70 Q60,65 50,65 Z" fill="currentColor"/>`,
+  `<path d="M30,30 Q10,30 10,50 Q10,70 30,70 L70,70 Q90,70 90,50 Q90,30 70,30 Q60,10 50,20 Q40,10 30,30 Z M35,40 Q25,40 25,50 Q25,60 35,60 Q45,60 45,50 Q45,40 35,40 Z M65,40 Q75,40 75,50 Q75,60 65,60 Q55,60 55,50 Q55,40 65,40 Z M50,65 Q40,65 40,75 Q50,80 60,75 Q60,65 50,65 Z" fill="currentColor"/>`,
+  `<path d="M30,20 Q10,20 10,40 L10,80 L30,80 L30,60 Q50,70 70,60 L70,80 L90,80 L90,40 Q90,20 70,20 Q60,10 50,20 Q40,10 30,20 Z M35,30 Q25,30 25,40 Q25,50 35,50 Q45,50 45,40 Q45,30 35,30 Z M65,30 Q75,30 75,40 Q75,50 65,50 Q55,50 55,40 Q55,30 65,30 Z" fill="currentColor"/>`,
+  `<path d="M50,20 C30,20 20,35 20,50 C20,65 30,80 50,80 C70,80 80,65 80,50 C80,35 70,20 50,20 Z M35,40 Q25,40 25,50 Q25,60 35,60 Q45,60 45,50 Q45,40 35,40 Z M65,40 Q75,40 75,50 Q75,60 65,60 Q55,60 55,50 Q55,40 65,40 Z M50,65 Q40,65 40,70 Q50,75 60,70 Q60,65 50,65 Z" fill="currentColor"/>`,
+];
+
+let mixtureIngredients = [];
+let currentCocktail = {};
+let selectedSnacks = [];
+let friends = [];
+let posts = [];
+
+function addIngredient() {
+  const list = document.getElementById('ingredientList');
+  const div = document.createElement('div');
+  div.className = 'ingredient';
+  
+  const select = document.createElement('select');
+  const categories = [...new Set(ingredients.map(ing => ing.category))];
+  categories.forEach(category => {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = category;
+    ingredients.filter(ing => ing.category === category).forEach(ing => {
+      const option = document.createElement('option');
+      option.value = ing.name;
+      option.textContent = ing.name;
+      optgroup.appendChild(option);
+    });
+    select.appendChild(optgroup);
+  });
+  
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = '0';
+  input.max = '100';
+  input.value = '0';
+  
+  const button = document.createElement('button');
+  button.textContent = '❌';
+  button.onclick = function() {
+    list.removeChild(div);
+    updateMixture();
+  };
+  
+  div.appendChild(select);
+  div.appendChild(input);
+  div.appendChild(button);
+  list.appendChild(div);
+  
+  select.onchange = updateMixture;
+  input.oninput = updateMixture;
+}
+
+function addSnack() {
+  const list = document.getElementById('snackList');
+  const div = document.createElement('div');
+  div.className = 'snack';
+  
+  const select = document.createElement('select');
+  snacks.forEach(snack => {
+    const option = document.createElement('option');
+    option.value = snack;
+    option.textContent = snack;
+    select.appendChild(option);
+  });
+  
+  const button = document.createElement('button');
+  button.textContent = '❌';
+  button.onclick = function() {
+    list.removeChild(div);
+    updateSnacks();
+  };
+  
+  div.appendChild(select);
+  div.appendChild(button);
+  list.appendChild(div);
+  
+  select.onchange = updateSnacks;
+}
+
+function predictTaste(baseTaste, agingPeriod) {
+  const agingEffects = {
+    '甘い': '深みのある甘さ',
+    '酸っぱい': 'まろやかな酸味',
+    '苦い': '複雑な苦味',
+    'スパイシー': '落ち着いたスパイス感',
+    '爽やか': 'まろやかな爽やかさ',
+    '強烈': '丸みを帯びた強さ',
+    'まろやか': 'さらになめらかな口当たり',
+    '繊細': '奥深い繊細さ',
+    '甘酸っぱい': 'バランスの取れた甘酸っぱさ'
+  };
+
+  let predictedTaste = baseTaste;
+  if (agingPeriod > 30) {
+    const baseTastes = baseTaste.split('、');
+    predictedTaste = baseTastes.map(taste => agingEffects[taste] || taste).join('、');
+    if (agingPeriod > 180) {
+      predictedTaste += '、複雑な風味';
+    }
+  }
+  return predictedTaste;
+}
+
+function updateMixture() {
+  mixtureIngredients = [];
+  let totalVolume = 0;
+  let totalAlcohol = 0;
+  let tastes = new Set();
+  
+  document.querySelectorAll('.ingredient').forEach(ing => {
+    const name = ing.querySelector('select').value;
+    const volume = parseFloat(ing.querySelector('input').value);
+    if (volume > 0) {
+      const ingredient = ingredients.find(i => i.name === name);
+      mixtureIngredients.push({ ...ingredient, volume });
+      totalVolume += volume;
+      totalAlcohol += volume * ingredient.alcohol / 100;
+      tastes.add(ingredient.taste);
+    }
+  });
+  
+  const alcoholContent = totalVolume > 0 ? (totalAlcohol / totalVolume * 100).toFixed(1) : 0;
+  const taste = Array.from(tastes).join('、');
+  const agingPeriod = parseInt(document.getElementById('agingPeriod').value) || 0;
+  const predictedTaste = predictTaste(taste, agingPeriod);
+  const name = generateCocktailName();
+
+  currentCocktail = { name, alcoholContent, taste, predictedTaste, agingPeriod, ingredients: mixtureIngredients };
+  
+  document.getElementById('cocktailName').textContent = name;
+  document.getElementById('alcoholContent').textContent = alcoholContent;
+  document.getElementById('taste').textContent = taste;
+  document.getElementById('predictedTaste').textContent = predictedTaste;
+  
+  updateCocktailGlass(totalVolume, alcoholContent);
+  updateAnimalSilhouette();
+  updateSnacks();
+}
+
+function updateSnacks() {
+  selectedSnacks = Array.from(document.querySelectorAll('.snack select')).map(select => select.value);
+  document.getElementById('recommendedSnacks').textContent = selectedSnacks.join('、');
+}
+
+function updateCocktailGlass(totalVolume, alcoholContent) {
+  const maxVolume = 100; // 最大容量を100mlと仮定
+  const fillPercentage = Math.min(totalVolume / maxVolume * 100, 100);
+  const liquid = document.getElementById('cocktailLiquid');
+  liquid.style.height = `${fillPercentage * 1.7}px`;
+  
+  const hue = Math.max(0, 200 - alcoholContent * 3); // 0%で青、高アルコールで赤に近づく
+  liquid.style.backgroundColor = `hsl(${hue}, 80%, 70%)`;
+}
+
+function updateAnimalSilhouette() {
+  const silhouette = document.getElementById('animalSilhouette');
+  silhouette.innerHTML = animalSilhouettes[Math.floor(Math.random() * animalSilhouettes.length)];
+}
+
+function generateCocktailName() {
+  const petNames = ['ポチ', 'タマ', 'ハチ', 'モモ', 'ココ', 'ミケ'];
+  const adjectives = ['元気な', '眠そうな', 'じゃれつく', 'のんびり', 'ふわふわ', 'つぶらな瞳の'];
+  return `${adjectives[Math.floor(Math.random() * adjectives.length)]}${petNames[Math.floor(Math.random() * petNames.length)]}の一杯`;
+}
+
+function shareCocktail() {
+  if (currentCocktail.name) {
+    const recordDate = document.getElementById('recordDate').value || new Date().toISOString().split('T')[0];
+    const post = {
+      user: "あなた",
+      cocktail: currentCocktail,
+      snacks: selectedSnacks,
+      time: new Date().toLocaleString(),
+      recordDate: recordDate
+    };
+    posts.unshift(post);
+    updateSocialFeed();
+  } else {
+    alert("先にカクテルを作成してください！");
+  }
+}
+
+function sendFriendRequest() {
+  const friendName = document.getElementById('friendName').value;
+  if (friendName && !friends.includes(friendName)) {
+    const requestDiv = document.createElement('div');
+    requestDiv.className = 'friend-request';
+    requestDiv.innerHTML = `
+      <span>${friendName}さんにフレンド申請を送りました</span>
+      <button onclick="acceptFriend('${friendName}')">承認</button>
+    `;
+    document.getElementById('friendRequests').appendChild(requestDiv);
+  }
+}
+
+function acceptFriend(name) {
+  friends.push(name);
+  document.getElementById('friendRequests').innerHTML = '';
+  alert(`${name}さんとフレンドになりました！`);
+}
+
+function updateSocialFeed() {
+  const feed = document.getElementById('socialFeed');
+  feed.innerHTML = '';
+  posts.forEach(post => {
+    const postDiv = document.createElement('div');
+    postDiv.className = 'post';
+    postDiv.innerHTML = `
+      <p><strong>${post.user}</strong> - ${post.time}</p>
+      <p>🍹 ${post.cocktail.name} (${post.cocktail.alcoholContent}%)</p>
+      <p>味: ${post.cocktail.taste}</p>
+      <p>熟成期間: ${post.cocktail.agingPeriod}日</p>
+      <p>予想の味: ${post.cocktail.predictedTaste}</p>
+      <p>おつまみ: ${post.snacks.join('、') || 'なし'}</p>
+      <p>記録日: ${post.recordDate}</p>
+    `;
+    feed.appendChild(postDiv);
+  });
+}
+
+// 初期状態で2つの材料を追加
+addIngredient();
+addIngredient();
+
+// おつまみを1つ追加
+addSnack();
+
+// 今日の日付を記録日のデフォルト値に設定
+document.getElementById('recordDate').valueAsDate = new Date();
+
+// ダミーの投稿を追加
+posts.push({
+  user: "タマ",
+  cocktail: {name: "眠そうなタマの一杯", alcoholContent: "5.5", taste: "甘い、爽やか", predictedTaste: "深みのある甘さ", agingPeriod: 0},
+  snacks: ["チーズ", "ミックスナッツ"],
+  time: "2023-06-01 15:30",
+  recordDate: "2023-06-01"
+});
+posts.push({
+  user: "ポチ",
+  cocktail: {name: "元気なポチの一杯", alcoholContent: "0", taste: "すっきり、さわやか", predictedTaste: "まろやかな爽やかさ", agingPeriod: 0},
+  snacks: ["枝豆", "カニカマ"],
+  time: "2023-06-01 14:45",
+  recordDate: "2023-06-01"
+});
+updateSocialFeed();
+updateAnimalSilhouette();
+
+document.getElementById('agingPeriod').addEventListener('input', updateMixture);
+</script>
+</body>
+</html>
